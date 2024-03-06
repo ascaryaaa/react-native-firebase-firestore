@@ -1,70 +1,108 @@
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { collection, addDoc, getDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
-import { useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, FlatList } from 'react-native';
+import { collection, addDoc, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import db from './firebaseConfig';
 
 export default function App() {
+  const [cityName, setCityName] = useState('');
+  const [countryName, setCountryName] = useState('');
+  const [cities, setCities] = useState([]);
 
-    const addCity = async () => {
-      try {
-        const docRef = await addDoc(collection(db, "cities"), {
-          name: "tokyo",
-          country: "Japan"
-        });
-        console.log("Document written with ID: ", docRef.id);
-      } catch (error) {
-        console.error("Error writting document: ", error)
-      }
-    };
-    addCity();
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const getCity = async () => {
-      const docRef = doc(db, "cities", "follow the output of addCity");
-      const docSnap = await getDoc(docRef);
+  const fetchData = async () => {
+    const querySnapshot = await getDocs(collection(db, "cities"));
+    const data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+    setCities(data);
+  };
 
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-      } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No such document!");
-      }
+  const addCity = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "cities"), {
+        name: cityName,
+        country: countryName
+      });
+      console.log("Document written with ID: ", docRef.id);
+      setCities([...cities, { id: docRef.id, name: cityName, country: countryName }]);
+      setCityName('');
+      setCountryName('');
+    } catch (error) {
+      console.error("Error writing document: ", error)
     }
-    getCity();
-    
-    const updateCity = async () => {
-      await setDoc(doc(db, "cities", "follow the output of addCity"), {
-        name: "Los Angles",
-        state: "CA",
-        country: "USA"
-      })
-    }
-    updateCity();
+  };
 
-    const deleteCity = async () => {
-      await deleteDoc(doc(db, "cities", "follow the output of addCity"), {
-        name: "Los Angles",
-        state: "CA",
-        country: "USA"
-      })
+  const updateCity = async (id) => {
+    try {
+      await setDoc(doc(db, "cities", id), {
+        name: cityName,
+        country: countryName
+      });
+      console.log("Document updated");
+      const updatedCities = cities.map(city => {
+        if (city.id === id) {
+          return { ...city, name: cityName, country: countryName };
+        }
+        return city;
+      });
+      setCities(updatedCities);
+      setCityName('');
+      setCountryName('');
+    } catch (error) {
+      console.error("Error updating document: ", error);
     }
-    deleteCity();
-  
+  };
+
+  const deleteCity = async (id) => {
+    try {
+      await deleteDoc(doc(db, "cities", id));
+      console.log("Document deleted");
+      const updatedCities = cities.filter(city => city.id !== id);
+      setCities(updatedCities);
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.item}>
+      <Text>{item.name}, {item.country}</Text>
+      <TouchableOpacity onPress={() => updateCity(item.id)}>
+        <Text style={styles.action}>Update</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deleteCity(item.id)}>
+        <Text style={styles.action}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <TouchableOpacity style={styles.button} onPress={ () => { addCity() } }>
-        <Text style={styles.text}>addCity</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter city name"
+        value={cityName}
+        onChangeText={text => setCityName(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Enter country name"
+        value={countryName}
+        onChangeText={text => setCountryName(text)}
+      />
+      <TouchableOpacity style={styles.button} onPress={addCity}>
+        <Text style={styles.text}>Add City</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={ () => { getCity() } }>
-        <Text style={styles.text}>getCity</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={ () => { updateCity() } }>
-        <Text style={styles.text}>updateCity</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={ () => { deleteCity() } }>
-        <Text style={styles.text}>deleteCity</Text>
-      </TouchableOpacity>
+      <FlatList
+        data={cities}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
       <StatusBar style="auto" />
     </View>
   );
@@ -76,12 +114,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 10,
+    width: '80%',
   },
   button: {
-    backgroundColor: 'cyan',
-    margin: 10,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 5,
+    width: 120,
+    alignItems: 'center',
   },
   text: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    borderRadius: 5,
     padding: 10,
-  }
+    marginVertical: 5,
+    width: '80%',
+  },
+  action: {
+    color: 'blue',
+    marginLeft: 10,
+  },
 });
