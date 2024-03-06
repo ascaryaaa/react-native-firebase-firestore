@@ -301,3 +301,91 @@ Change DC to firebase document token
     const deleteCity = async () => {
       await deleteDoc(doc(db, "cities", "maIfJJZQOe4pU5HawVgE"), {
 ```
+
+### 13.Implementing Real-Time Data Fetching with Firestore
+
+To enhance the application's functionality, real-time data fetching is implemented using Firebase Firestore. With real-time data fetching, the application can update its UI automatically whenever there's a change in the database.
+
+Before integrating real-time data fetching, the application manually fetched data from Firestore when needed. Now, with the useEffect hook, the application fetches data upon component mount, ensuring that the latest data is always displayed to the user.
+
+```
+useEffect(() => {
+  fetchData();
+}, []);
+```
+
+The fetchData function retrieves data from the Firestore collection "cities" and updates the cities state with the retrieved data.
+
+```
+const fetchData = async () => {
+  const querySnapshot = await getDocs(collection(db, "cities"));
+  const data = [];
+  querySnapshot.forEach((doc) => {
+    data.push({ id: doc.id, ...doc.data() });
+  });
+  setCities(data);
+};
+```
+
+### 14. Updating Add City Functionality
+
+Previously, the "Add City" functionality only updated the local state with the newly added city. Now, it also adds the city to the Firestore database in real-time.
+
+```
+const addCity = async () => {
+  try {
+    const docRef = await addDoc(collection(db, "cities"), {
+      name: cityName,
+      country: countryName
+    });
+    console.log("Document written with ID: ", docRef.id);
+    setCities([...cities, { id: docRef.id, name: cityName, country: countryName }]);
+    setCityName('');
+    setCountryName('');
+  } catch (error) {
+    console.error("Error writing document: ", error)
+  }
+};
+
+```
+
+### 15. Enhancing Update and Delete Functionality
+
+Previously, the "Update City" and "Delete City" functionalities only operated on the local state. Now, they also update or delete the corresponding document in the Firestore database in real-time.
+
+```
+const updateCity = async (id) => {
+  try {
+    await setDoc(doc(db, "cities", id), {
+      name: cityName,
+      country: countryName
+    });
+    console.log("Document updated");
+    const updatedCities = cities.map(city => {
+      if (city.id === id) {
+        return { ...city, name: cityName, country: countryName };
+      }
+      return city;
+    });
+    setCities(updatedCities);
+    setCityName('');
+    setCountryName('');
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
+const deleteCity = async (id) => {
+  try {
+    await deleteDoc(doc(db, "cities", id));
+    console.log("Document deleted");
+    const updatedCities = cities.filter(city => city.id !== id);
+    setCities(updatedCities);
+  } catch (error) {
+    console.error("Error deleting document: ", error);
+  }
+};
+
+```
+
+These enhancements ensure that the application interacts seamlessly with the Firestore database, providing users with a real-time experience when adding, updating, or deleting cities.
