@@ -1,4 +1,9 @@
-# Setting up Firebase in an Android App
+# Firebase database firestore for basic CRUD
+
+App result:
+
+![image](https://github.com/ascaryaaa/react-native-firebase-firestore/assets/73589875/54ec6f7f-c968-4144-bde2-16ca64af96e0)
+
 ### 1. Configure Android App
 
 Create an Android app with a package name matching the one specified in your app.json. Ensure you have an adaptive icon configured, and the package name set to "com.ascaryaaa.cicd".
