@@ -137,15 +137,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   item: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    flexDirection: 'row',
     borderWidth: 1,
     borderColor: 'lightgray',
     borderRadius: 5,
     padding: 10,
     marginVertical: 5,
-    width: '80%',
+    width: '100%',
   },
   action: {
     color: 'blue',
