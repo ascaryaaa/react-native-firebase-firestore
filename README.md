@@ -121,9 +121,9 @@ const db = getFirestore(app);
 export default db;
 ```
 
-### 9. Add Firestore Snippet
+### 9. Add CRUD operation
 
-Add Firestore snippet to perform basic CRUD operations. For example:
+Add Firestore snippet to perform basic CRUD operations. For example, adding add:
 
 ```
   useEffect(() => {
@@ -147,9 +147,9 @@ To app.js, to become like this:
 ```
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { doc, setDoc, collection, addDog } from "firebase/firestore";
-import db from "./firebaseConfig";
+import { collection, addDoc, getDoc, doc, setDoc } from "firebase/firestore";
 import { useEffect } from 'react';
+import db from './firebaseConfig';
 
 export default function App() {
   
@@ -190,10 +190,12 @@ const styles = StyleSheet.create({
 
 ### 10. Integrate Firestore in App
 
-- Import Firestore Modules: Import necessary Firestore modules such as doc, setDoc, collection, and addDog from "firebase/firestore".
+To integrate Firestore into your app.js, follow these steps:
+
+- Import Firestore Modules: Import necessary Firestore modules such as collection, addDoc, getDoc, doc, and setDoc from "firebase/firestore".
 
 ```
-import { doc, setDoc, collection, addDog } from "firebase/firestore";
+import { collection, addDoc, getDoc, doc, setDoc } from "firebase/firestore";
 ```
 
 - Initialize Firestore: Import the db object from your firebaseConfig.js file to initialize Firestore within your app.js.
@@ -202,10 +204,13 @@ import { doc, setDoc, collection, addDog } from "firebase/firestore";
 import db from "./firebaseConfig";
 ```
 
-### 11. Setup Databse in Firebase
+### 11. Setup Database in Firebase
 
-- Navigate to firestore database, then create database testing
-- Set the rule allow read, write to `true`
+- Navigate to the Firestore database section in your Firebase console.
+
+- Create a new Firestore database or choose an existing one for testing purposes.
+
+- Update Firestore Rules: Set the Firestore security rules to allow read and write operations by setting them to `true`.
 
 ```
 rules_version = '2';
@@ -218,8 +223,81 @@ service cloud.firestore {
   }
 }
 ```
-- run the program
-
-check in databse firestore
+- run the program and then check firestore databse
 
 ![image](https://github.com/ascaryaaa/react-native-firebase-firestore/assets/73589875/d80403dc-3a14-47e0-aab2-aec682b901b0)
+
+### 12. add more CRUD Implementatrion: 
+
+### Get
+
+Implement a function to retrieve data from Firestore using the getDoc() function. Replace "cities" and "SF" with your collection name and document ID respectively.
+
+```
+    const getCity = async () => {
+      const docRef = doc(db, "cities", "SF");
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }
+    getCity();
+```
+
+Change SF to firebase document token
+
+```
+    const getCity = async () => {
+      const docRef = doc(db, "cities", "maIfJJZQOe4pU5HawVgE");
+```
+
+Result:
+![image](https://github.com/ascaryaaa/react-native-firebase-firestore/assets/73589875/cd5786bc-92fd-42d6-b85f-b87fdd9363f7)
+
+### Update
+
+Implement a function to update data in Firestore using the setDoc() function. Replace "cities", "SD", and the object with your collection name, document ID, and new data respectively.
+
+```
+    const updateCity = async () => {
+      await setDoc(doc(db, "cities", "SD"), {
+        name: "Los Angles",
+        state: "CA",
+        country: "USA"
+      })
+    }
+    updateCity();
+```
+
+Change SF to firebase document token
+
+```
+    const updateCity = async () => {
+      await setDoc(doc(db, "cities", "maIfJJZQOe4pU5HawVgE"), {
+```
+
+Result:
+![image](https://github.com/ascaryaaa/react-native-firebase-firestore/assets/73589875/1d8af841-4be9-4fdb-a25a-e7536c3b3ae1)
+
+### Delete
+
+```
+    const deleteCity = async () => {
+      await deleteDoc(doc(db, "cities", "DC"), {
+        name: "Los Angles",
+        state: "CA",
+        country: "USA"
+      })
+    }
+    deleteCity();
+```
+Change DC to firebase document token
+
+```
+    const deleteCity = async () => {
+      await deleteDoc(doc(db, "cities", "maIfJJZQOe4pU5HawVgE"), {
+```
