@@ -123,17 +123,20 @@ import { firestore } from "firebase/firestore";
 Add Firestore snippet to perform basic CRUD operations. For example:
 
 ```
-db.collection("users").add({
-    first: "Ada",
-    last: "Lovelace",
-    born: 1815
-})
-.then((docRef) => {
-    console.log("Document written with ID: ", docRef.id);
-})
-.catch((error) => {
-    console.error("Error adding document: ", error);
-});
+  useEffect(() => {
+    const addCity = async () => {
+      try {
+        const docRef = await addDoc(collection(db, "cities"), {
+          name: "tokyo",
+          country: "Japan"
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (error) {
+        console.error("Error writting document: ", error)
+      }
+    };
+    addCity();
+  }, []);
 ```
 
 To app.js, to become like this:
@@ -141,19 +144,28 @@ To app.js, to become like this:
 ```
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import firebase from './firebaseConfig';
+import { doc, setDoc, collection, addDog } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+import { useEffect } from 'react';
 
 export default function App() {
-  db.collection("users").add({
-    first: "Ada",
-    last: "Lovelace",
-    born: 1815
-  })
-  .then((docRef) => {
-      console.log("Document written with ID: ", docRef.id);
-  })
-  .catch((error) => {
-      console.error("Error adding document: ", error);
-  });
+  
+  useEffect(() => {
+    const addCity = async () => {
+      try {
+        const docRef = await addDoc(collection(db, "cities"), {
+          name: "tokyo",
+          country: "Japan"
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (error) {
+        console.error("Error writting document: ", error)
+      }
+    };
+    addCity();
+  }, []);
+  
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
@@ -171,15 +183,21 @@ const styles = StyleSheet.create({
   },
 });
 
+
 ```
 
 ### 10. Integrate Firestore in App
 
-Integrate Firestore into your app by importing Firebase and initializing Firestore.
+- Import Firestore Modules: Import necessary Firestore modules such as doc, setDoc, collection, and addDog from "firebase/firestore".
 
 ```
-import firebase from './firebaseConfig';
-const db = firebase.firestore();
+import { doc, setDoc, collection, addDog } from "firebase/firestore";
+```
+
+- Initialize Firestore: Import the db object from your firebaseConfig.js file to initialize Firestore within your app.js.
+
+```
+import { db } from "./firebaseConfig";
 ```
 
 ### 11. Implement CRUD Operations
