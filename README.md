@@ -115,7 +115,10 @@ const app = initializeApp(firebaseConfig);
 Import necessary Firebase modules like Firestore into your firebaseConfig.js file.
 
 ```
-import { firestore } from "firebase/firestore";
+import { getFirestore } from 'firebase/firestore';
+//
+const db = getFirestore(app);
+export default db;
 ```
 
 ### 9. Add Firestore Snippet
@@ -199,4 +202,24 @@ import { doc, setDoc, collection, addDog } from "firebase/firestore";
 import db from "./firebaseConfig";
 ```
 
-### 11. Implement CRUD Operations
+### 11. Setup Databse in Firebase
+
+- Navigate to firestore database, then create database testing
+- Set the rule allow read, write to `true`
+
+```
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+- run the program
+
+check in databse firestore
+
+![image](https://github.com/ascaryaaa/react-native-firebase-firestore/assets/73589875/d80403dc-3a14-47e0-aab2-aec682b901b0)
