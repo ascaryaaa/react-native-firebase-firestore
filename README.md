@@ -144,9 +144,8 @@ To app.js, to become like this:
 ```
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import firebase from './firebaseConfig';
 import { doc, setDoc, collection, addDog } from "firebase/firestore";
-import { db } from "./firebaseConfig";
+import db from "./firebaseConfig";
 import { useEffect } from 'react';
 
 export default function App() {
@@ -197,7 +196,7 @@ import { doc, setDoc, collection, addDog } from "firebase/firestore";
 - Initialize Firestore: Import the db object from your firebaseConfig.js file to initialize Firestore within your app.js.
 
 ```
-import { db } from "./firebaseConfig";
+import db from "./firebaseConfig";
 ```
 
 ### 11. Implement CRUD Operations
